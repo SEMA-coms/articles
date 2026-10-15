@@ -1,0 +1,40 @@
+name: Update article list
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'posts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-list:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the list of uploaded articles
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'posts';
+          const files = fs.existsSync(path) ? fs.readdirSync(path).filter(name => name.endsWith('.html')) : [];
+          const clean = value => value.replace(/\s+/g, ' ').trim();
+          const posts = files.map(file => {
+            const filePath = path + '/' + file;
+            const html = fs.readFileSync(filePath, 'utf8');
+            const title = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]) || file.replace(/[-_]/g, ' ').replace(/\.html$/i, '');
+            const description = (html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i)?.[1]) || 'SEMA article.';
+            return { title: clean(title), summary: clean(description), date: new Date(fs.statSync(filePath).mtime).toISOString().slice(0, 10), category: 'Articles', url: 'posts/' + encodeURIComponent(file) };
+          }).sort((a, b) => b.date.localeCompare(a.date));
+          fs.writeFileSync('posts.json', JSON.stringify(posts, null, 2) + '\n');
+          NODE
+      - name: Commit the updated list
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add posts.json
+          git diff --cached --quiet || git commit -m 'Update article list'
+          git push
