@@ -1,3 +1,4 @@
+
 name: Update article list
 
 on:
@@ -15,20 +16,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build the list of uploaded articles
+      - name: Build the published article list
         run: |
           node <<'NODE'
           const fs = require('fs');
-          const path = 'posts';
-          const files = fs.existsSync(path) ? fs.readdirSync(path).filter(name => name.endsWith('.html')) : [];
-          const clean = value => value.replace(/\s+/g, ' ').trim();
-          const posts = files.map(file => {
-            const filePath = path + '/' + file;
-            const html = fs.readFileSync(filePath, 'utf8');
-            const title = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]) || file.replace(/[-_]/g, ' ').replace(/\.html$/i, '');
-            const description = (html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i)?.[1]) || 'SEMA article.';
-            return { title: clean(title), summary: clean(description), date: new Date(fs.statSync(filePath).mtime).toISOString().slice(0, 10), category: 'Articles', url: 'posts/' + encodeURIComponent(file) };
-          }).sort((a, b) => b.date.localeCompare(a.date));
+          const root = 'posts';
+          const clean = value => String(value || '').replace(/\s+/g, ' ').trim();
+          const posts = [];
+          const scan = dir => {
+            if (!fs.existsSync(dir)) return;
+            const metadataFile = dir + '/article.json';
+            const articleFile = dir + '/index.html';
+            if (fs.existsSync(metadataFile) && fs.existsSync(articleFile)) {
+              const meta = JSON.parse(fs.readFileSync(metadataFile, 'utf8'));
+              if (meta.published !== false) {
+                const relative = dir.replace(/^posts\//, '');
+                posts.push({
+                  title: clean(meta.title) || relative,
+                  summary: clean(meta.summary) || 'SEMA article.',
+                  date: /^\d{4}-\d{2}-\d{2}$/.test(meta.date || '') ? meta.date : new Date(fs.statSync(articleFile).mtime).toISOString().slice(0, 10),
+                  category: clean(meta.category) || 'Articles',
+                  url: 'posts/' + relative.split('/').map(encodeURIComponent).join('/') + '/',
+                  thumbnail: meta.thumbnail ? 'posts/' + relative.split('/').map(encodeURIComponent).join('/') + '/' + meta.thumbnail.split('/').map(encodeURIComponent).join('/') : ''
+                });
+              }
+              return;
+            }
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              if (entry.isDirectory()) scan(dir + '/' + entry.name);
+            }
+          };
+          scan(root);
+          posts.sort((a, b) => b.date.localeCompare(a.date));
           fs.writeFileSync('posts.json', JSON.stringify(posts, null, 2) + '\n');
           NODE
       - name: Commit the updated list
