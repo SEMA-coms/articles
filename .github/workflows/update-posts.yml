@@ -16,30 +16,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build the published article list
+      - name: Build the article list from uploaded folders
         run: |
           node <<'NODE'
           const fs = require('fs');
           const root = 'posts';
           const clean = value => String(value || '').replace(/\s+/g, ' ').trim();
+          const encodePath = value => value.split('/').map(encodeURIComponent).join('/');
           const posts = [];
+          const categoryFor = name => /newsletter/i.test(name) ? 'Newsletters' : /plan/i.test(name) ? 'Plans' : 'Articles';
           const scan = dir => {
             if (!fs.existsSync(dir)) return;
-            const metadataFile = dir + '/article.json';
             const articleFile = dir + '/index.html';
-            if (fs.existsSync(metadataFile) && fs.existsSync(articleFile)) {
-              const meta = JSON.parse(fs.readFileSync(metadataFile, 'utf8'));
-              if (meta.published !== false) {
-                const relative = dir.replace(/^posts\//, '');
-                posts.push({
-                  title: clean(meta.title) || relative,
-                  summary: clean(meta.summary) || 'SEMA article.',
-                  date: /^\d{4}-\d{2}-\d{2}$/.test(meta.date || '') ? meta.date : new Date(fs.statSync(articleFile).mtime).toISOString().slice(0, 10),
-                  category: clean(meta.category) || 'Articles',
-                  url: 'posts/' + relative.split('/').map(encodeURIComponent).join('/') + '/',
-                  thumbnail: meta.thumbnail ? 'posts/' + relative.split('/').map(encodeURIComponent).join('/') + '/' + meta.thumbnail.split('/').map(encodeURIComponent).join('/') : ''
-                });
-              }
+            if (fs.existsSync(articleFile)) {
+              const html = fs.readFileSync(articleFile, 'utf8');
+              const relative = dir.replace(/^posts\//, '');
+              const title = clean((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1]) || relative.replace(/[-_]/g, ' ');
+              const summary = clean((html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i) || [])[1]) || 'SEMA article.';
+              const image = clean((html.match(/<img\b[^>]*\bsrc=["']([^"']+)/i) || [])[1]);
+              posts.push({
+                title,
+                summary,
+                date: new Date(fs.statSync(articleFile).mtime).toISOString().slice(0, 10),
+                category: categoryFor(relative),
+                url: 'posts/' + encodePath(relative) + '/',
+                thumbnail: image ? (/^https?:\/\//i.test(image) ? image : 'posts/' + encodePath(relative + '/' + image.replace(/^\.\//, ''))) : ''
+              });
               return;
             }
             for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
