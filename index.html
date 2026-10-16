@@ -64,7 +64,7 @@
   <main class="layout"><section aria-label="Publications"><p class="eyebrow">Latest from SEMA</p><div class="filters" id="filters" aria-label="Filter publications"></div><div class="post-list" id="articles" aria-live="polite"></div><nav class="pagination" id="pagination" aria-label="Publication pages"></nav><p class="empty" id="empty" hidden>No publications match this category.</p></section>
   <aside class="sidebar"><section class="widget"><h2>Search</h2><form class="search-row" id="search-form"><input id="search" type="search" placeholder="Search publications" aria-label="Search publications"><button type="submit">Search</button></form></section><section class="widget"><h2>Recent Posts</h2><ul class="recent-list" id="recent-posts"></ul></section><section class="widget"><h2>Categories</h2><ul class="category-list" id="categories"></ul></section></aside></main>
   <script>
-    const thumbnails = {'https://sema-coms.github.io/September-2026-article/':'https://sema-coms.github.io/September-2026-article/Thumbnail.png'};
+    let thumbnails = {};
     const staticArticles = [
       { title:'September 2026 Article', url:'https://sema-coms.github.io/September-2026-article/', summary:'September 2026 article.', date:'2026-09-01', category:'Articles' },
       { title:'June 2026: Ebola Article', url:'https://sema-coms.github.io/June-article-2026/', summary:'June article on Ebola.', date:'2026-06-01', category:'Articles' },
@@ -91,7 +91,7 @@
       recent.replaceChildren(...articles.slice(0,5).map(article => { const li=document.createElement('li'), link=document.createElement('a'); link.href=article.url; link.textContent=article.title; li.append(link); return li; }));
     }
     document.querySelector('#search-form').addEventListener('submit', event => { event.preventDefault(); term=search.value.trim().toLowerCase(); page=1; draw(); });
-    fetch('posts.json',{cache:'no-store'}).then(response => response.ok ? response.json() : []).then(posts => { articles=[...posts,...staticArticles.map(article => ({...article, thumbnail: thumbnails[article.url] || article.thumbnail || ''}))].sort((a,b)=>b.date.localeCompare(a.date)); draw(); }).catch(() => { articles=staticArticles; draw(); });
+    Promise.all([fetch('posts.json',{cache:'no-store'}).then(response => response.ok ? response.json() : []),fetch('legacy-thumbnails.json',{cache:'no-store'}).then(response => response.ok ? response.json() : {})]).then(([posts, legacy]) => { thumbnails=legacy; articles=[...posts,...staticArticles.map(article => ({...article, thumbnail: thumbnails[article.url] || article.thumbnail || ''}))].sort((a,b)=>b.date.localeCompare(a.date)); draw(); }).catch(() => { articles=staticArticles; draw(); });
   </script>
 </body>
 </html>
