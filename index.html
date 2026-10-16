@@ -1,17 +1,95 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SEMA Articles</title><style>
-:root{--ink:#17211e;--muted:#5c6863;--paper:#f9f7f1;--line:#d9ddd6;--accent:#176b53}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--paper);font-family:Georgia,serif}main{max-width:860px;margin:auto;padding:72px 24px}header{max-width:620px;margin-bottom:42px}.eyebrow,.meta{font:700 .73rem/1.3 system-ui,sans-serif;letter-spacing:.12em;color:var(--accent)}h1{font-size:clamp(2.8rem,8vw,5rem);margin:.15em 0;letter-spacing:-.055em}.intro{color:var(--muted);font-size:1.2rem;line-height:1.55}nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}button{cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:8px 13px;background:transparent;color:var(--ink)}button.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}article{padding:27px 0;border-top:1px solid var(--line)}.thumb{display:block;width:180px;aspect-ratio:16/9;object-fit:cover;margin:0 0 16px;border-radius:3px;background:#e7e9e3}h2{font-size:1.7rem;margin:7px 0;letter-spacing:-.025em}a{color:inherit;text-underline-offset:3px}.summary{color:var(--muted);line-height:1.5;margin:0 0 14px}.read{color:var(--accent);font:600 .9rem system-ui,sans-serif;text-decoration:none}.read:hover{text-decoration:underline}
-</style></head><body><main><header><p class="eyebrow">SEMA WRITING</p><h1>Articles</h1><p class="intro">One place to find SEMA articles, newsletters, and plans.</p></header><nav id="filters"></nav><section id="articles"></section></main><script>
-const articles=[
-{title:'September 2026 Article',url:'https://sema-coms.github.io/September-2026-article/',summary:'September 2026 article.',date:'2026-09-01',category:'Articles'},
-{title:'June 2026: Ebola Article',url:'https://sema-coms.github.io/June-article-2026/',summary:'June article on Ebola.',date:'2026-06-01',category:'Articles'},
-{title:'Strategic Plan 2026–2029',url:'https://sema-coms.github.io/Strategic-Plan-2026-2029/',summary:'SEMA strategic plan for 2026–2029.',date:'2026-04-01',category:'Plans'},
-{title:'March 2026 Article',url:'https://sema-coms.github.io/March2026/',summary:'March 2026 article.',date:'2026-03-01',category:'Articles'},
-{title:'February Newsletter',url:'https://sema-coms.github.io/February/',summary:'February newsletter.',date:'2026-02-01',category:'Newsletters'},
-{title:'February Newsletter (archive)',url:'https://sema-coms.github.io/Feb-Article/',summary:'An earlier February newsletter repository.',date:'2026-02-01',category:'Newsletters'},
-{title:'January 2026 Article',url:'https://sema-coms.github.io/Jan-2026-article/',summary:'January 2026 article.',date:'2026-01-01',category:'Articles'}];
-let active='All';const out=document.querySelector('#articles'),nav=document.querySelector('#filters');const date=d=>new Intl.DateTimeFormat(undefined,{year:'numeric',month:'long',day:'numeric'}).format(new Date(d+'T00:00:00'));
-function text(tag,value,className){const el=document.createElement(tag);el.textContent=value;if(className)el.className=className;return el}
-function draw(){out.innerHTML='';for(const a of articles.filter(a=>active==='All'||a.category===active).sort((a,b)=>b.date.localeCompare(a.date))){const card=document.createElement('article');if(a.thumbnail){const image=document.createElement('img');image.className='thumb';image.src=a.thumbnail;image.alt='';image.loading='lazy';card.append(image)}card.append(text('p',date(a.date)+' · '+a.category,'meta'));const heading=document.createElement('h2'),title=document.createElement('a');title.href=a.url;title.textContent=a.title;heading.append(title);card.append(heading,text('p',a.summary,'summary'));const link=document.createElement('a');link.className='read';link.href=a.url;link.textContent='Read article →';card.append(link);out.append(card)}nav.innerHTML='';for(const c of ['All',...new Set(articles.map(a=>a.category))]){const b=document.createElement('button');b.textContent=c;b.className=c===active?'active':'';b.onclick=()=>{active=c;draw()};nav.append(b)}}
-fetch('posts.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).then(posts=>{articles.push(...posts);draw()}).catch(()=>draw());
-</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Publications | Talk to SEMA</title>
+  <meta name="description" content="Newsletters, blogs, and publications from SEMA.">
+  <style>
+    :root { --orange:#ff9b2f; --orange-dark:#e78118; --ink:#1e2a30; --muted:#778088; --line:#e8ebed; --soft:#f5f6f6; --white:#fff; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); font-family:Arial,Helvetica,sans-serif; background:var(--white); }
+    a { color:inherit; text-decoration:none; }
+    .site-header { border-bottom:1px solid #edf0f1; background:#fff; }
+    .nav { width:min(1180px,calc(100% - 40px)); min-height:74px; margin:auto; display:flex; align-items:center; gap:34px; }
+    .brand { display:flex; align-items:center; white-space:nowrap; }
+    .brand-logo { width:42px; height:42px; object-fit:contain; border-radius:8px; }
+    .nav-button { margin-left:auto; padding:10px 17px; background:var(--orange); color:#fff; border-radius:20px; box-shadow:0 3px 7px #ff9b2f55; }
+    .hero { min-height:192px; padding:56px 20px 42px; text-align:center; background:linear-gradient(180deg,#fff 0%,#fbfbfb 100%); position:relative; overflow:hidden; }
+    .hero:before,.hero:after { content:""; position:absolute; border:2px solid #eef0f0; border-radius:50%; width:76px; height:76px; }
+    .hero:before { left:-37px; bottom:-37px; } .hero:after { right:-28px; top:-38px; }
+    .hero .eyebrow { margin:0 0 7px; }
+    .hero h1 { margin:0; font-size:clamp(26px,4vw,39px); letter-spacing:-.045em; }
+    .hero p { margin:10px 0 0; color:#8b9399; font-size:13px; }
+    .layout { width:min(1120px,calc(100% - 40px)); margin:48px auto 70px; display:grid; grid-template-columns:minmax(0,1fr) 286px; gap:58px; align-items:start; }
+    .eyebrow { margin:0 0 9px; color:var(--orange-dark); font-size:10px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
+    .filters { display:flex; flex-wrap:wrap; gap:9px; margin:0 0 22px; }
+    .filters button { appearance:none; border:1px solid #e4e7e8; border-radius:20px; padding:8px 12px; background:#fff; color:#657077; font-size:12px; font-weight:700; cursor:pointer; }
+    .filters button[aria-pressed="true"] { color:#fff; border-color:var(--orange); background:var(--orange); }
+    .post-list { display:grid; gap:22px; }
+    .pagination { display:flex; flex-wrap:wrap; gap:8px; margin:28px 0 0; }
+    .pagination button { min-width:36px; height:36px; padding:0 10px; border:1px solid #e4e7e8; border-radius:8px; background:#fff; color:#667178; font-size:12px; font-weight:800; cursor:pointer; }
+    .pagination button[aria-current="page"] { color:#fff; border-color:var(--orange); background:var(--orange); }
+    .post-card { display:grid; grid-template-columns:210px minmax(0,1fr); min-height:172px; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff; transition:transform .18s ease,box-shadow .18s ease; box-shadow:0 7px 18px #24333d0c; }
+    .post-card:hover { transform:translateY(-3px); box-shadow:0 15px 32px #24333d1c; }
+    .cover { width:calc(100% - 20px); height:calc(100% - 20px); min-height:152px; margin:10px; object-fit:cover; display:block; background:#e8ecee; border-radius:11px; box-shadow:0 7px 15px #1e2a3030; }
+    .placeholder { display:grid; place-items:center; color:#fff; background:linear-gradient(135deg,#23333a,#44545b); font-size:18px; font-weight:800; letter-spacing:.08em; }
+    .post-content { padding:20px 23px 19px; }
+    .post-meta { margin:0 0 8px; color:var(--orange-dark); font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+    .post-title { margin:0 0 10px; font-size:20px; line-height:1.2; letter-spacing:-.025em; }
+    .post-title a:hover { color:var(--orange-dark); }
+    .post-summary { margin:0 0 15px; color:var(--muted); font-size:13px; line-height:1.55; }
+    .read-more { color:var(--orange-dark); font-size:12px; font-weight:800; }
+    .read-more:hover { text-decoration:underline; }
+    .empty { color:var(--muted); padding:24px 0; }
+    .sidebar { display:grid; gap:18px; }
+    .widget { padding:21px; background:var(--soft); }
+    .widget h2 { margin:0 0 16px; font-size:15px; letter-spacing:-.02em; }
+    .search-row { display:flex; }
+    .search-row input { width:100%; min-width:0; height:38px; padding:0 10px; border:1px solid #e0e4e5; font:12px Arial,sans-serif; }
+    .search-row button { border:0; padding:0 13px; background:var(--orange); color:#fff; cursor:pointer; font-size:12px; font-weight:800; }
+    .recent-list,.category-list { list-style:none; padding:0; margin:0; display:grid; gap:0; }
+    .recent-list a,.category-list button { display:block; width:100%; border:0; border-bottom:1px solid #e2e5e6; padding:11px 0; background:transparent; color:#667178; text-align:left; font-size:12px; line-height:1.35; cursor:pointer; }
+    .recent-list li:last-child a,.category-list li:last-child button { border-bottom:0; }
+    .recent-list a:hover,.category-list button:hover { color:var(--orange-dark); }
+    @media (max-width:800px) { .nav { min-height:62px; gap:12px; } .nav-button { margin-left:auto; } .layout { grid-template-columns:1fr; gap:35px; margin-top:34px; } .sidebar { grid-template-columns:repeat(2,minmax(0,1fr)); } .post-card { grid-template-columns:160px minmax(0,1fr); } }
+    @media (max-width:540px) { .nav-button { padding:9px 12px; font-size:11px; } .hero { min-height:166px; padding-top:40px; } .layout { width:min(100% - 28px,1120px); } .post-card { grid-template-columns:1fr; } .cover { min-height:164px; max-height:205px; } .sidebar { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="site-header"><nav class="nav" aria-label="Primary navigation"><a class="brand" href="./"><img class="brand-logo" src="SEMA%20LOGO%20PRIMARY.svg" alt="SEMA logo"></a><a class="nav-button" href="https://talktosema.org/">Get involved</a></nav></header>
+  <section class="hero"><p class="eyebrow">SEMA WRITING</p><h1>Publications</h1><p>One place to find SEMA publications, newsletters, and other resources.</p></section>
+  <main class="layout"><section aria-label="Publications"><p class="eyebrow">Latest from SEMA</p><div class="filters" id="filters" aria-label="Filter publications"></div><div class="post-list" id="articles" aria-live="polite"></div><nav class="pagination" id="pagination" aria-label="Publication pages"></nav><p class="empty" id="empty" hidden>No publications match this category.</p></section>
+  <aside class="sidebar"><section class="widget"><h2>Search</h2><form class="search-row" id="search-form"><input id="search" type="search" placeholder="Search publications" aria-label="Search publications"><button type="submit">Search</button></form></section><section class="widget"><h2>Recent Posts</h2><ul class="recent-list" id="recent-posts"></ul></section><section class="widget"><h2>Categories</h2><ul class="category-list" id="categories"></ul></section></aside></main>
+  <script>
+    const staticArticles = [
+      { title:'September 2026 Article', url:'https://sema-coms.github.io/September-2026-article/', summary:'September 2026 article.', date:'2026-09-01', category:'Articles' },
+      { title:'June 2026: Ebola Article', url:'https://sema-coms.github.io/June-article-2026/', summary:'June article on Ebola.', date:'2026-06-01', category:'Articles' },
+      { title:'Strategic Plan 2026-2029', url:'https://sema-coms.github.io/Strategic-Plan-2026-2029/', summary:'SEMA strategic plan for 2026-2029.', date:'2026-04-01', category:'Others' },
+      { title:'March 2026 Article', url:'https://sema-coms.github.io/March2026/', summary:'March 2026 article.', date:'2026-03-01', category:'Articles' },
+      { title:'February Newsletter', url:'https://sema-coms.github.io/February/', summary:'February newsletter.', date:'2026-02-01', category:'Newsletters' },
+      { title:'February Newsletter (archive)', url:'https://sema-coms.github.io/Feb-Article/', summary:'An earlier February newsletter repository.', date:'2026-02-01', category:'Newsletters' },
+      { title:'January 2026 Article', url:'https://sema-coms.github.io/Jan-2026-article/', summary:'January 2026 article.', date:'2026-01-01', category:'Articles' }
+    ];
+    const list = document.querySelector('#articles'), filters = document.querySelector('#filters'), empty = document.querySelector('#empty'), pagination = document.querySelector('#pagination');
+    const search = document.querySelector('#search'), recent = document.querySelector('#recent-posts'), categories = document.querySelector('#categories');
+    let articles = [], active = 'All', term = '', page = 1;
+    const pageSize = 6;
+    const formatDate = date => new Intl.DateTimeFormat(undefined,{year:'numeric',month:'long',day:'numeric'}).format(new Date(date+'T00:00:00'));
+    const visibleArticles = () => articles.filter(a => (active === 'All' || a.category === active) && (!term || [a.title,a.summary,a.category].join(' ').toLowerCase().includes(term)));
+    function chooseCategory(category) { active = category; page = 1; draw(); }
+    function draw() {
+      const categoriesFound = ['All', ...new Set(articles.map(a => a.category))];
+      filters.replaceChildren(...categoriesFound.map(category => { const button=document.createElement('button'); button.textContent=category; button.setAttribute('aria-pressed', String(category===active)); button.onclick=()=>chooseCategory(category); return button; }));
+      categories.replaceChildren(...categoriesFound.slice(1).map(category => { const li=document.createElement('li'), button=document.createElement('button'); button.textContent=category; button.onclick=()=>chooseCategory(category); li.append(button); return li; }));
+      const visible = visibleArticles(), pages = Math.max(1, Math.ceil(visible.length / pageSize)); page = Math.min(page, pages); list.replaceChildren(); empty.hidden = visible.length > 0;
+      visible.slice((page - 1) * pageSize, page * pageSize).forEach(article => { const card=document.createElement('article'); card.className='post-card'; if(article.thumbnail) { const image=document.createElement('img'); image.className='cover'; image.src=article.thumbnail; image.alt=''; image.loading='lazy'; card.append(image); } else { const placeholder=document.createElement('div'); placeholder.className='cover placeholder'; placeholder.textContent='SEMA'; card.append(placeholder); } const content=document.createElement('div'); content.className='post-content'; const meta=document.createElement('p'); meta.className='post-meta'; meta.textContent=formatDate(article.date)+'  /  '+article.category; const heading=document.createElement('h2'); heading.className='post-title'; const title=document.createElement('a'); title.href=article.url; title.textContent=article.title; heading.append(title); const summary=document.createElement('p'); summary.className='post-summary'; summary.textContent=article.summary; const read=document.createElement('a'); read.className='read-more'; read.href=article.url; read.textContent='READ MORE  →'; content.append(meta,heading,summary,read); card.append(content); list.append(card); });
+      pagination.hidden = pages < 2; pagination.replaceChildren(...Array.from({length:pages}, (_, index) => { const button=document.createElement('button'); button.textContent=index + 1; button.setAttribute('aria-current', index + 1 === page ? 'page' : 'false'); button.onclick=()=>{ page=index + 1; draw(); document.querySelector('.post-list').scrollIntoView({behavior:'smooth',block:'start'}); }; return button; }));
+      recent.replaceChildren(...articles.slice(0,5).map(article => { const li=document.createElement('li'), link=document.createElement('a'); link.href=article.url; link.textContent=article.title; li.append(link); return li; }));
+    }
+    document.querySelector('#search-form').addEventListener('submit', event => { event.preventDefault(); term=search.value.trim().toLowerCase(); page=1; draw(); });
+    fetch('posts.json',{cache:'no-store'}).then(response => response.ok ? response.json() : []).then(posts => { articles=[...posts,...staticArticles].sort((a,b)=>b.date.localeCompare(a.date)); draw(); }).catch(() => { articles=staticArticles; draw(); });
+  </script>
+</body>
+</html>
