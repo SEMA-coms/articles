@@ -25,6 +25,18 @@ jobs:
           const encodePath = value => value.split('/').map(encodeURIComponent).join('/');
           const posts = [];
           const categoryFor = name => /newsletter/i.test(name) ? 'Newsletters' : /plan/i.test(name) ? 'Plans' : 'Articles';
+          const findThumbnail = dir => {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const path = dir + '/' + entry.name;
+              if (entry.isDirectory()) {
+                const found = findThumbnail(path);
+                if (found) return found;
+              } else if (/thumbnail\.(png|jpe?g|webp|gif)$/i.test(entry.name)) {
+                return path;
+              }
+            }
+            return '';
+          };
           const scan = dir => {
             if (!fs.existsSync(dir)) return;
             const articleFile = dir + '/index.html';
@@ -33,7 +45,9 @@ jobs:
               const relative = dir.replace(/^posts\//, '');
               const title = clean((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1]) || relative.replace(/[-_]/g, ' ');
               const summary = clean((html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i) || [])[1]) || 'SEMA article.';
-              const image = clean((html.match(/<img\b[^>]*\bsrc=["']([^"']+)/i) || [])[1]);
+              const articleImage = clean((html.match(/<img\b[^>]*\bsrc=["']([^"']+)/i) || [])[1]);
+              const namedThumbnail = findThumbnail(dir);
+              const image = namedThumbnail ? namedThumbnail.slice(dir.length + 1) : articleImage;
               posts.push({
                 title,
                 summary,
