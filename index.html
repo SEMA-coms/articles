@@ -34,7 +34,7 @@
     .pagination button[aria-current="page"] { color:#fff; border-color:var(--orange); background:var(--orange); }
     .post-card { display:grid; grid-template-columns:210px minmax(0,1fr); min-height:172px; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff; transition:transform .18s ease,box-shadow .18s ease; box-shadow:0 7px 18px #24333d0c; }
     .post-card:hover { transform:translateY(-3px); box-shadow:0 15px 32px #24333d1c; }
-    .cover { width:calc(100% - 20px); height:calc(100% - 20px); min-height:152px; margin:10px; object-fit:cover; display:block; background:#e8ecee; border-radius:11px; box-shadow:0 7px 15px #1e2a3030; }
+    .cover { width:calc(100% - 20px); height:auto; aspect-ratio:16 / 9; align-self:center; margin:10px; object-fit:contain; display:block; background:#e8ecee; border-radius:11px; box-shadow:0 7px 15px #1e2a3030; }
     .placeholder { display:grid; place-items:center; color:#fff; background:linear-gradient(135deg,#23333a,#44545b); font-size:18px; font-weight:800; letter-spacing:.08em; }
     .post-content { padding:20px 23px 19px; }
     .post-meta { margin:0 0 8px; color:var(--orange-dark); font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
@@ -55,7 +55,7 @@
     .recent-list li:last-child a,.category-list li:last-child button { border-bottom:0; }
     .recent-list a:hover,.category-list button:hover { color:var(--orange-dark); }
     @media (max-width:800px) { .nav { min-height:62px; gap:12px; } .nav-button { margin-left:auto; } .layout { grid-template-columns:1fr; gap:35px; margin-top:34px; } .sidebar { grid-template-columns:repeat(2,minmax(0,1fr)); } .post-card { grid-template-columns:160px minmax(0,1fr); } }
-    @media (max-width:540px) { .nav-button { padding:9px 12px; font-size:11px; } .hero { min-height:166px; padding-top:40px; } .layout { width:min(100% - 28px,1120px); } .post-card { grid-template-columns:1fr; } .cover { min-height:164px; max-height:205px; } .sidebar { grid-template-columns:1fr; } }
+    @media (max-width:540px) { .nav-button { padding:9px 12px; font-size:11px; } .hero { min-height:166px; padding-top:40px; } .layout { width:min(100% - 28px,1120px); } .post-card { grid-template-columns:1fr; } .sidebar { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
